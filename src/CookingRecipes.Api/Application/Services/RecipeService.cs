@@ -1,4 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
+using CookingRecipes.Api.Application.Extensions;
+using CookingRecipes.Api.Domain.DTOs;
 using CookingRecipes.Api.Domain.Entities;
 using CookingRecipes.Api.Domain.Interfaces;
 using CookingRecipes.Api.Infrastructure.Data;
@@ -17,33 +19,109 @@ namespace CookingRecipes.Api.Application.Services
             _context = context;
         }
 
-        public async Task<Recipe> CreateRecipeAsync(Recipe recipe)
+        public async Task<bool> CreateRecipeAsync(RecipeDto recipe)
         {
-            _context.Recipes.Add(recipe);
+            var recipeEntity = recipe.ToEntity();
 
-            await _context.SaveChangesAsync().ConfigureAwait(false);
+            _context.Recipes.Add(recipeEntity);
 
-            return recipe;
+            var result = await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            return result != 0;
         }
 
-        public async Task<IEnumerable<Recipe>> GetAllRecipesAsync()
-        => await _context.Recipes.ToListAsync().ConfigureAwait(false);
+        public async Task<IEnumerable<RecipeDto>?> GetAllRecipesAsync()
+        {
+            var recipes = await _context.Recipes
+                .Include(r => r.RecipeIngredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .ToListAsync().ConfigureAwait(false);
 
-        public async Task<Recipe?> GetRecipeByIdAsync(int id)
-        => await _context.Recipes
+            if (recipes.Count == 0) return null;
+
+            return recipes.Select(r => r.ToDto());
+        }
+
+        public async Task<RecipeDto?> GetRecipeByIdAsync(int id)
+        {
+            var recipe = await _context.Recipes
                 .Include(r => r.RecipeIngredients)
                 .ThenInclude(ri => ri.Ingredient)
                 .FirstOrDefaultAsync(r => r.RecipeID == id).ConfigureAwait(false);
 
-        public Task DeleteRecipeAsync(int id)
+            if (recipe == null) return null;
+
+            return recipe?.ToDto();
+        }
+        public async Task<bool> UpdateRecipeAsync(int id, RecipeDto recipeDto)
         {
-            throw new NotImplementedException();
+            var existingRecipe = await _context.Recipes
+                .Include(r => r.RecipeIngredients)
+                .FirstOrDefaultAsync(r => r.RecipeID == id).ConfigureAwait(false);
+
+            if (existingRecipe == null) return false;
+
+            existingRecipe.Title = recipeDto.Title;
+            existingRecipe.Description = recipeDto.Description;
+            existingRecipe.Instructions = recipeDto.Instructions;
+            existingRecipe.PrepTime = recipeDto.PrepTime;
+            existingRecipe.CookTime = recipeDto.CookTime;
+            existingRecipe.Servings = recipeDto.Servings;
+
+            var newIngredientIds = recipeDto.RecipeIngredients.Select(i => i.IngredientID).ToList();
+
+            var ingredientsToRemove = existingRecipe.RecipeIngredients
+                .Where(ri => !newIngredientIds.Contains(ri.IngredientID))
+                .ToList();
+
+            foreach (var ingredient in ingredientsToRemove)
+            {
+                _context.RecipeIngredients.Remove(ingredient);
+            }
+
+            foreach (var ingredientDto in recipeDto.RecipeIngredients)
+            {
+                var existingIngredient = existingRecipe.RecipeIngredients
+                    .FirstOrDefault(ri => ri.IngredientID == ingredientDto.IngredientID);
+
+                if (existingIngredient != null)
+                {
+                    existingIngredient.Quantity = ingredientDto.Quantity;
+                    existingIngredient.MeasureUnit = ingredientDto.MeasureUnit;
+                }
+                else
+                {
+                    existingRecipe.RecipeIngredients.Add(new RecipeIngredient
+                    {
+                        RecipeID = id,
+                        IngredientID = ingredientDto.IngredientID,
+                        Quantity = ingredientDto.Quantity,
+                        MeasureUnit = ingredientDto.MeasureUnit
+                    });
+                }
+            }
+
+            var result = await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            return result != 0;
         }
 
 
-        public Task UpdateRecipeAsync(int id, Recipe recipe)
+        public async Task<bool> DeleteRecipeAsync(int id)
         {
-            throw new NotImplementedException();
+            var recipe = await _context.Recipes
+                .Include(r => r.RecipeIngredients)
+                .ThenInclude(ri => ri.Ingredient)
+                .FirstOrDefaultAsync(r => r.RecipeID == id).ConfigureAwait(false);
+
+            if (recipe == null) return false;
+
+            _context.RecipeIngredients.RemoveRange(recipe.RecipeIngredients);
+            _context.Recipes.Remove(recipe);
+
+            var removed = await _context.SaveChangesAsync().ConfigureAwait(false);
+
+            return removed != 0;
         }
     }
 }

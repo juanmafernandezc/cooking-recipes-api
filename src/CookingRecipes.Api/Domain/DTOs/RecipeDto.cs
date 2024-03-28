@@ -1,6 +1,6 @@
-﻿namespace CookingRecipes.Api.Domain.Entities
+﻿namespace CookingRecipes.Api.Domain.DTOs
 {
-    public class Recipe
+    public class RecipeDto
     {
         public int RecipeID { get; set; }
         public int UserID { get; set; }
@@ -10,7 +10,6 @@
         public int PrepTime { get; set; }
         public int CookTime { get; set; }
         public int Servings { get; set; }
-        public User? User { get; set; }
-        public ICollection<RecipeIngredient> RecipeIngredients { get; set; } = new List<RecipeIngredient>();
+        public List<RecipeIngredientDto> RecipeIngredients { get; set; } = new();
     }
 }

@@ -1,13 +1,14 @@
-﻿using CookingRecipes.Api.Domain.Entities;
+﻿using CookingRecipes.Api.Domain.DTOs;
+using CookingRecipes.Api.Domain.Entities;
 
 namespace CookingRecipes.Api.Domain.Interfaces
 {
     public interface IRecipeService
     {
-        Task<Recipe> CreateRecipeAsync(Recipe recipe);
-        Task<IEnumerable<Recipe>> GetAllRecipesAsync();
-        Task<Recipe?> GetRecipeByIdAsync(int id);
-        Task UpdateRecipeAsync(int id, Recipe recipe);
-        Task DeleteRecipeAsync(int id);
+        Task<bool> CreateRecipeAsync(RecipeDto recipe);
+        Task<IEnumerable<RecipeDto>?> GetAllRecipesAsync();
+        Task<RecipeDto?> GetRecipeByIdAsync(int id);
+        Task<bool> UpdateRecipeAsync(int id, RecipeDto recipe);
+        Task<bool> DeleteRecipeAsync(int id);
     }
 }

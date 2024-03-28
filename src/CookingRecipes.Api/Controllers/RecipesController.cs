@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
+using CookingRecipes.Api.Domain.DTOs;
 using CookingRecipes.Api.Domain.Entities;
 using CookingRecipes.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -25,13 +26,13 @@ namespace CookingRecipes.Api.Controllers
         // Add a new recipe
         [HttpPost("Add")]
         [Authorize]
-        public async Task<ActionResult> CreateRecipe([FromBody] Recipe recipe)
+        public async Task<ActionResult> CreateRecipe([FromBody] RecipeDto recipe)
         {
             try
             {
-                var createdRecipe = await _recipeService.CreateRecipeAsync(recipe).ConfigureAwait(false);
+                var isCreated = await _recipeService.CreateRecipeAsync(recipe).ConfigureAwait(false);
 
-                return createdRecipe.RecipeID != 0 ? Ok(createdRecipe.RecipeID) : BadRequest("The recipe could not be created");
+                return isCreated ? Ok(isCreated) : BadRequest("The recipe could not be created");
             }
             catch (Exception ex)
             {
@@ -42,11 +43,12 @@ namespace CookingRecipes.Api.Controllers
 
         // Get all recipes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Recipe>>> GetRecipes()
+        public async Task<ActionResult<IEnumerable<RecipeDto>>> GetRecipes()
         {
             try
             {
                 var recipes = await _recipeService.GetAllRecipesAsync().ConfigureAwait(false);
+
                 return Ok(recipes);
             }
             catch (Exception ex)
@@ -78,13 +80,14 @@ namespace CookingRecipes.Api.Controllers
         // Update an existing recipe
         [HttpPut("{id}")]
         [Authorize]
-        public async Task<ActionResult> UpdateRecipe(int id, [FromBody] Recipe recipe)
+        public async Task<ActionResult> UpdateRecipe(int id, [FromBody] RecipeDto recipe)
         {
             try
             {
                 if (id != recipe.RecipeID) return BadRequest("Recipe ID mismatch");
 
-                await _recipeService.UpdateRecipeAsync(id, recipe);
+                await _recipeService.UpdateRecipeAsync(id, recipe).ConfigureAwait(false);
+
                 return NoContent();
             }
             catch (Exception ex)
@@ -101,8 +104,9 @@ namespace CookingRecipes.Api.Controllers
         {
             try
             {
-                await _recipeService.DeleteRecipeAsync(id);
-                return NoContent();
+                var isDeleted = await _recipeService.DeleteRecipeAsync(id).ConfigureAwait(false);
+
+                return isDeleted ? NoContent() : BadRequest("Recipe could not be deleted");
             }
             catch (Exception ex)
             {
