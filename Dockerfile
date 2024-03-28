@@ -29,10 +29,10 @@ WORKDIR /App
 COPY --from=build-env /App/out .
 
 # Set the environment variables
-ENV DatabaseConnectionString $databaseConnectionString
-ENV JwtKey $jwtKey
-ENV JwtIssuer $jwtIssuer
-ENV JwtAudience $jwtAudience
+ENV DatabaseConnectionString=$databaseConnectionString
+ENV JwtKey=$jwtKey
+ENV JwtIssuer=$jwtIssuer
+ENV JwtAudience=$jwtAudience
 
 # Inform Docker that the container is listening on the specified port at runtime
 EXPOSE 8080
