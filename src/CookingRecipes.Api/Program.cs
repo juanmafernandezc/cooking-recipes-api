@@ -29,4 +29,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+var url = "http://0.0.0.0:8080";
+app.Run(url);
