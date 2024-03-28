@@ -1,4 +1,5 @@
-﻿using CookingRecipes.Api.Application.Services;
+﻿using CommunityToolkit.Diagnostics;
+using CookingRecipes.Api.Application.Services;
 using CookingRecipes.Api.Domain.Interfaces;
 using CookingRecipes.Api.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -31,6 +32,14 @@ namespace CookingRecipes.Api
 
         private static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
+            var jwtIssuer = Environment.GetEnvironmentVariable("JwtIssuer");
+            var jwtAudience = Environment.GetEnvironmentVariable("JwtAudience");
+            var jwtKey = Environment.GetEnvironmentVariable("JwtKey");
+
+            Guard.IsNotNullOrEmpty(jwtIssuer);
+            Guard.IsNotNullOrEmpty(jwtAudience);
+            Guard.IsNotNullOrEmpty(jwtKey);
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -40,9 +49,9 @@ namespace CookingRecipes.Api
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = configuration["Jwt:Issuer"],
-                    ValidAudience = configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"])),
+                    ValidIssuer = jwtIssuer,
+                    ValidAudience = jwtAudience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
                 };
             });
 
@@ -51,8 +60,12 @@ namespace CookingRecipes.Api
 
         private static IServiceCollection AddDbContext(this IServiceCollection services, IConfiguration configuration)
         {
+            var databaseConnection = Environment.GetEnvironmentVariable("DatabaseConnectionString");
+
+            Guard.IsNotNullOrEmpty(databaseConnection);
+
             services.AddDbContext<DataContext>(options =>
-                options.UseSqlServer(configuration["DatabaseConnectionString"]));
+                options.UseSqlServer(databaseConnection));
 
             return services;
         }
