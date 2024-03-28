@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Diagnostics;
-using CookingRecipes.Api.Domain.Entities;
+﻿using CookingRecipes.Api.Domain.Entities;
 using CookingRecipes.Api.Domain.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

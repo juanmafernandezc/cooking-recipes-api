@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Diagnostics;
 using CookingRecipes.Api.Domain.DTOs;
 using CookingRecipes.Api.Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CookingRecipes.Api.Controllers

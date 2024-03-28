@@ -1,5 +1,4 @@
 ﻿using CookingRecipes.Api.Domain.DTOs;
-using CookingRecipes.Api.Domain.Entities;
 
 namespace CookingRecipes.Api.Domain.Interfaces
 {
