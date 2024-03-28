@@ -16,7 +16,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:8080",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DatabaseConnectionString": "Server=localhost;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;",
+        "JwtKey": "Hello",
+        "JwtIssuer": "Hello",
+        "JwtAudience": "Hello"
       }
     },
     "IIS Express": {
