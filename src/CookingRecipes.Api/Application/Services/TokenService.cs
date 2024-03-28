@@ -10,14 +10,6 @@ namespace CookingRecipes.Api.Application.Services
 {
     public class TokenService : ITokenService
     {
-        private readonly IConfiguration _configuration;
-
-        public TokenService(IConfiguration configuration)
-        {
-            Guard.IsNotNull(configuration);
-
-            _configuration = configuration;
-        }
         public string CreateToken(User user)
         {
             var claims = new List<Claim>
@@ -26,7 +18,7 @@ namespace CookingRecipes.Api.Application.Services
                 new(ClaimTypes.Name, user.Username)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JwtKey")!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256Signature);
 
             var tokenDescriptor = new SecurityTokenDescriptor
@@ -34,8 +26,8 @@ namespace CookingRecipes.Api.Application.Services
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddMinutes(5),
                 SigningCredentials = creds,
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"]
+                Issuer = Environment.GetEnvironmentVariable("JwtIssuer"),
+                Audience = Environment.GetEnvironmentVariable("JwtAudience")
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
