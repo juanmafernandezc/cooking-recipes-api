@@ -19,6 +19,11 @@ jobs:
           login-server: cookingrecipesregistry.azurecr.io
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
+          build-args: |
+            databaseConnectionString=${{ secrets.DATABASE_CONNECTION_STRING }}
+            jwtKey=${{ secrets.JWT_KEY }}
+            jwtIssuer=${{ secrets.JWT_ISSUER }}
+            jwtAudience=${{ secrets.JWT_AUDIENCE }}
           
       - name: Build and push the Docker image
         uses: docker/build-push-action@v2
