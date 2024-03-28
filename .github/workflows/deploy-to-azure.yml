@@ -27,11 +27,6 @@ jobs:
           tags: cookingrecipesregistry.azurecr.io/cookingrecipesapi:${{ github.sha }}
           file: ./Dockerfile
           context: .
-          build-args: |
-            databaseConnectionString=${{ secrets.DATABASE_CONNECTION_STRING }}
-            jwtKey=${{ secrets.JWT_KEY }}
-            jwtIssuer=${{ secrets.JWT_ISSUER }}
-            jwtAudience=${{ secrets.JWT_AUDIENCE }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v2
