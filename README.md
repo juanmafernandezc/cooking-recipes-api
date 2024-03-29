@@ -94,11 +94,5 @@ To run the project locally, simply deploy it using the provided profile within y
 
 ```sh
 docker build -t cookingrecipes.api .
-docker run -d -p 8080:8080 \
-  --name mycookingapi \
-  -e "DatabaseConnectionString=Server=192.168.1.13;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;" \
-  -e "JwtKey=tu_jwt_key_aqui" \
-  -e "JwtIssuer=tu_jwt_issuer_aqui" \
-  -e "JwtAudience=tu_jwt_audience_aqui" \
-  cookingrecipes.api
+docker run -d -p 8080:8080 --name mycookingapi -e "DatabaseConnectionString=Server=192.168.1.13;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;" -e "JwtKey=tu_jwt_key_aqui" -e "JwtIssuer=tu_jwt_issuer_aqui" -e "JwtAudience=tu_jwt_audience_aqui" cookingrecipes.api
 ```
