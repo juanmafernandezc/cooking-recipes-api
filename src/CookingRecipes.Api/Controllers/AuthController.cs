@@ -28,12 +28,12 @@ namespace CookingRecipes.Api.Controllers
             {
                 var result = await _userService.CreateUserAsync(userRegisterDto).ConfigureAwait(false);
 
-                return result ? Ok(result) : BadRequest("Could not add a new user");
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error while processing Register: {ex}", ex);
-                throw;
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -44,12 +44,12 @@ namespace CookingRecipes.Api.Controllers
             {
                 var result = await _userService.LoginAsync(userLoginDto).ConfigureAwait(false);
 
-                return Ok(result);
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error while processing Login: {ex}", ex);
-                throw;
+                return StatusCode(500, "Internal server error");
             }
         }
     }

@@ -23,33 +23,31 @@ namespace CookingRecipes.Api.Controllers
             _recipeService = recipeService;
         }
 
-        // Add a new recipe
         [HttpPost("Add")]
         [Authorize]
-        public async Task<ActionResult> CreateRecipe([FromBody] RecipeDto recipe)
+        public async Task<IActionResult> CreateRecipe([FromBody] RecipeDto recipe)
         {
             try
             {
-                var isCreated = await _recipeService.CreateRecipeAsync(recipe).ConfigureAwait(false);
+                var result = await _recipeService.CreateRecipeAsync(recipe).ConfigureAwait(false);
 
-                return isCreated ? Ok(isCreated) : BadRequest("The recipe could not be created");
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error while processing CreateRecipe: {ex}", ex);
-                throw;
+                return StatusCode(500, "Internal server error");
             }
         }
 
-        // Get all recipes
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RecipeDto>>> GetRecipes()
+        public async Task<IActionResult> GetRecipes()
         {
             try
             {
-                var recipes = await _recipeService.GetAllRecipesAsync().ConfigureAwait(false);
+                var result = await _recipeService.GetAllRecipesAsync().ConfigureAwait(false);
 
-                return Ok(recipes);
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
@@ -58,17 +56,14 @@ namespace CookingRecipes.Api.Controllers
             }
         }
 
-        // Get recipe by id
         [HttpGet("{id}")]
-        public async Task<ActionResult<Recipe>> GetRecipeById(int id)
+        public async Task<ActionResult> GetRecipeById(int id)
         {
             try
             {
-                var recipe = await _recipeService.GetRecipeByIdAsync(id).ConfigureAwait(false);
+                var result = await _recipeService.GetRecipeByIdAsync(id).ConfigureAwait(false);
 
-                if (recipe == null) return NotFound();
-
-                return Ok(recipe);
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
@@ -77,18 +72,15 @@ namespace CookingRecipes.Api.Controllers
             }
         }
 
-        // Update an existing recipe
         [HttpPut("{id}")]
         [Authorize]
         public async Task<ActionResult> UpdateRecipe(int id, [FromBody] RecipeDto recipe)
         {
             try
             {
-                if (id != recipe.RecipeID) return BadRequest("Recipe ID mismatch");
+                var result = await _recipeService.UpdateRecipeAsync(id, recipe).ConfigureAwait(false);
 
-                await _recipeService.UpdateRecipeAsync(id, recipe).ConfigureAwait(false);
-
-                return NoContent();
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
@@ -97,16 +89,15 @@ namespace CookingRecipes.Api.Controllers
             }
         }
 
-        // Delete a recipe
         [HttpDelete("{id}")]
         [Authorize]
         public async Task<ActionResult> DeleteRecipe(int id)
         {
             try
             {
-                var isDeleted = await _recipeService.DeleteRecipeAsync(id).ConfigureAwait(false);
+                var result = await _recipeService.DeleteRecipeAsync(id).ConfigureAwait(false);
 
-                return isDeleted ? NoContent() : BadRequest("Recipe could not be deleted");
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {

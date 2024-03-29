@@ -1,5 +1,6 @@
 ﻿using CookingRecipes.Api.Domain.Entities;
 using CookingRecipes.Api.Domain.Interfaces;
+using CookingRecipes.Api.Domain.Models.Responses;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -9,7 +10,7 @@ namespace CookingRecipes.Api.Application.Services
 {
     public class TokenService : ITokenService
     {
-        public string CreateToken(User user)
+        public ApiResponse<string> CreateToken(User user)
         {
             var claims = new List<Claim>
             {
@@ -23,7 +24,7 @@ namespace CookingRecipes.Api.Application.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.UtcNow.AddMinutes(5),
+                Expires = DateTime.UtcNow.AddHours(2),
                 SigningCredentials = creds,
                 Issuer = Environment.GetEnvironmentVariable("JwtIssuer"),
                 Audience = Environment.GetEnvironmentVariable("JwtAudience")
@@ -32,7 +33,7 @@ namespace CookingRecipes.Api.Application.Services
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
-            return tokenHandler.WriteToken(token);
+            return new ApiResponse<string>(tokenHandler.WriteToken(token));
         }
     }
 }

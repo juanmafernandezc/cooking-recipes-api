@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Diagnostics;
+using CookingRecipes.Api.Domain.DTOs;
 using CookingRecipes.Api.Domain.Entities;
 using CookingRecipes.Api.Domain.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -24,18 +25,18 @@ namespace CookingRecipes.Api.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<ActionResult> AddIngredient(Ingredient ingredient)
+        public async Task<ActionResult> AddIngredient(IngredientDto ingredient)
         {
             try
             {
                 var result = await _ingredientService.CreateIngredientAsync(ingredient).ConfigureAwait(false);
 
-                return result ? Ok(result) : BadRequest("The ingredient could not be created");
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error while processing AddIngredient: {ex}", ex);
-                throw;
+                return StatusCode(500, "Internal server error");
             }
         }
 
@@ -44,14 +45,64 @@ namespace CookingRecipes.Api.Controllers
         {
             try
             {
-                var ingredients = await _ingredientService.GetAllIngredientsAsync().ConfigureAwait(false);
+                var result = await _ingredientService.GetAllIngredientsAsync().ConfigureAwait(false);
 
-                return Ok(ingredients);
+                return StatusCode(result.StatusCode, result);
             }
             catch (Exception ex)
             {
                 _logger.LogError("Error while processing GetAllIngredients: {ex}", ex);
-                throw;
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IngredientDto>> GetIngredientById(int id)
+        {
+            try
+            {
+                var result = await _ingredientService.GetIngredientByIdAsync(id).ConfigureAwait(false);
+
+                return StatusCode(result.StatusCode, result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error while processing GetIngredientById: {ex}", ex);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        public async Task<ActionResult> UpdateIngredient(int id, [FromBody] IngredientDto ingredientDto)
+        {
+            try
+            {
+                var result = await _ingredientService.UpdateIngredientAsync(id, ingredientDto).ConfigureAwait(false);
+
+                return StatusCode(result.StatusCode, result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error while processing UpdateIngredient: {ex}", ex);
+                return StatusCode(500, "Internal server error");
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize]
+        public async Task<ActionResult> DeleteIngredient(int id)
+        {
+            try
+            {
+                var result = await _ingredientService.DeleteIngredientAsync(id).ConfigureAwait(false);
+
+                return StatusCode(result.StatusCode, result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error while processing DeleteIngredient: {ex}", ex);
+                return StatusCode(500, "Internal server error");
             }
         }
     }

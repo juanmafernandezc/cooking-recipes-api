@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Diagnostics;
+using CookingRecipes.Api.Common;
 using CookingRecipes.Api.Domain.DTOs;
 using CookingRecipes.Api.Domain.Entities;
 using CookingRecipes.Api.Domain.Interfaces;
+using CookingRecipes.Api.Domain.Models.Responses;
 using CookingRecipes.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography;
@@ -14,6 +16,11 @@ namespace CookingRecipes.Api.Application.Services
         private readonly DataContext _context;
         private readonly ITokenService _tokenService;
 
+        private const string UserExistsMessage = "User already exists.";
+        private const string UserCreatedMessage = "User created successfully.";
+        private const string UserNotRegisteredMessage = "User not registered.";
+        private const string NotChangedDatabaseMessage = "No changes were made to the database.";
+
         public UserService(DataContext context, ITokenService tokenService)
         {
             Guard.IsNotNull(context);
@@ -23,11 +30,10 @@ namespace CookingRecipes.Api.Application.Services
             _tokenService = tokenService;
         }
 
-        public async Task<bool> CreateUserAsync(UserRegisterDto userRegisterDto)
+        public async Task<ApiResponse<string?>> CreateUserAsync(UserRegisterDto userRegisterDto)
         {
-
             var userExists = await _context.Users.AnyAsync(u => u.Username == userRegisterDto.Username).ConfigureAwait(false);
-            Guard.IsFalse(userExists);
+            if (userExists) return new ApiResponse<string?>(null, false, UserExistsMessage, HttpStatusCodes.Conflict);
 
             var hmac = new HMACSHA512();
             var user = new User
@@ -41,14 +47,17 @@ namespace CookingRecipes.Api.Application.Services
             _context.Users.Add(user);
             var result = await _context.SaveChangesAsync().ConfigureAwait(false);
 
-            return result == 1;
+            if (result != 0) return new ApiResponse<string?>(UserCreatedMessage);
+
+            return new ApiResponse<string?>(null, false, NotChangedDatabaseMessage, HttpStatusCodes.InternalServerError);
         }
-        public async Task<string> LoginAsync(UserLoginDto userLoginDto)
+        public async Task<ApiResponse<string?>> LoginAsync(UserLoginDto userLoginDto)
         {
             var user = await ValidateLoginAsync(userLoginDto).ConfigureAwait(false);
-            Guard.IsNotNull(user);
 
-            return _tokenService.CreateToken(user);
+            if (user == null) return new ApiResponse<string?>(null, false, UserNotRegisteredMessage, HttpStatusCodes.Unauthorized);
+
+            return _tokenService.CreateToken(user)!;
         }
 
         private async Task<User?> ValidateLoginAsync(UserLoginDto userLoginDto)
