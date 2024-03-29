@@ -69,9 +69,20 @@ CREATE TABLE RecipeIngredients (
 );
 ```
 
-### Environment Variables
-Ensure the following environment variables are configured within the project:
+### Project Configuration
+To get started with the Cooking Recipes API, follow these steps:
 
+#### Clone the repository:
+```bash
+git clone https://github.com/juanmafernandezc/cooking-recipes-api.git
+```
+
+#### Navigate to the project's root directory:
+```bash
+cd cooking-recipes-api
+```
+
+#### You'll need to set up the following environment variables within the project:
 ```json
 "environmentVariables": {
     "ASPNETCORE_ENVIRONMENT": "Development",
@@ -82,9 +93,9 @@ Ensure the following environment variables are configured within the project:
 }
 ```
 
-Generate and assign values for JwtKey, JwtIssuer, and JwtAudience, as they are not provided in the repository for security reasons.
+**Note**: The JwtKey, JwtIssuer, and JwtAudience values are placeholders. You will need to generate and provide your own values for these variables, as they are not included in the repository for security reasons.
 
-### Running the Project
+#### Running the Project
 To run the project locally, simply deploy it using the provided profile within your development environment. For Docker deployment, execute the following commands from the project root:
 
 ```sh
