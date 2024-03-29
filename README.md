@@ -99,4 +99,4 @@ docker run -d -p 8080:8080 --name mycookingapi -e "DatabaseConnectionString=Serv
 
 ### API Documentation and Collection
 
-For ease of testing and exploring the Cooking Recipes API, a Postman collection is provided with pre-configured requests for each available endpoint [here](./postman/collection.json).
+For ease of testing and exploring the Cooking Recipes API, a Postman collection is provided with pre-configured requests for each available endpoint [here](./Postman/collection.json).
