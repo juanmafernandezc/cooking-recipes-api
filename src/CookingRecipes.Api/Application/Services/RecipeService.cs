@@ -88,9 +88,9 @@ namespace CookingRecipes.Api.Application.Services
 
             var userIdFromToken = _tokenService.GetUserIdFromToken(token);
 
-            if (userIdFromToken != id) return new ApiResponse<string?>(null, false, NotUserIdMatchUpdateMessage, HttpStatusCodes.Unauthorized);
-
             if (existingRecipe == null) return new ApiResponse<string?>(null, false, RecipeNotExistMessage, HttpStatusCodes.NotFound);
+
+            if (userIdFromToken != id) return new ApiResponse<string?>(null, false, NotUserIdMatchUpdateMessage, HttpStatusCodes.Unauthorized);
 
             var newIngredientIds = recipeDto.RecipeIngredients.Select(i => i.IngredientID).Distinct().ToList();
             foreach (var ingredientId in newIngredientIds)
@@ -151,7 +151,6 @@ namespace CookingRecipes.Api.Application.Services
                 .Include(r => r.RecipeIngredients)
                 .ThenInclude(ri => ri.Ingredient)
                 .FirstOrDefaultAsync(r => r.RecipeID == id).ConfigureAwait(false);
-
 
             if (recipe == null) return new ApiResponse<string?>(null, false, RecipeNotFoundMessage, HttpStatusCodes.NotFound);
 
