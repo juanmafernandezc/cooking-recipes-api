@@ -18,7 +18,7 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Admin1234" -p 1433:1433 -d m
 Connection string template for local deployment:
 
 ```
-Server=192.168.1.13;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;
+Server=localhost;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;
 ```
 
 **Important:** For Docker deployments, replace the `Server` address in the connection string with the IP address of the machine hosting the Docker container.
