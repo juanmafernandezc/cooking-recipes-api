@@ -22,12 +22,7 @@ namespace CookingRecipes.Api.Application.Extensions
                     IngredientID = ri.IngredientID,
                     Quantity = ri.Quantity,
                     MeasureUnit = ri.MeasureUnit,
-                    Ingredient = new IngredientDto
-                    {
-                        IngredientID = ri.Ingredient!.IngredientID,
-                        Name = ri.Ingredient.Name,
-                        Description = ri.Ingredient.Description
-                    }
+                    Ingredient = ri.Ingredient!.ToDto(),
                 }).ToList()
             };
         }
@@ -50,6 +45,26 @@ namespace CookingRecipes.Api.Application.Extensions
                     Quantity = ri.Quantity,
                     MeasureUnit = ri.MeasureUnit,
                 }).ToList()
+            };
+        }
+
+        public static IngredientDto ToDto(this Ingredient ingredient)
+        {
+            return new IngredientDto
+            {
+                IngredientID = ingredient.IngredientID,
+                Name = ingredient.Name,
+                Description = ingredient.Description
+            };
+        }
+
+        public static Ingredient ToEntity(this IngredientDto ingredientDto)
+        {
+            return new Ingredient
+            {
+                IngredientID = ingredientDto.IngredientID,
+                Name = ingredientDto.Name,
+                Description = ingredientDto.Description
             };
         }
     }
