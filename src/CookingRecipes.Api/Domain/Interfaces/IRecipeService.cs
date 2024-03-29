@@ -8,7 +8,7 @@ namespace CookingRecipes.Api.Domain.Interfaces
         Task<ApiResponse<string?>> CreateRecipeAsync(RecipeDto recipe);
         Task<ApiResponse<IEnumerable<RecipeDto>?>> GetAllRecipesAsync();
         Task<ApiResponse<RecipeDto?>> GetRecipeByIdAsync(int id);
-        Task<ApiResponse<string?>> UpdateRecipeAsync(int id, RecipeDto recipe);
-        Task<ApiResponse<string?>> DeleteRecipeAsync(int id);
+        Task<ApiResponse<string?>> UpdateRecipeAsync(int id, RecipeDto recipe, string token);
+        Task<ApiResponse<string?>> DeleteRecipeAsync(int id, string token);
     }
 }

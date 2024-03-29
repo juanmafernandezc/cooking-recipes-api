@@ -35,5 +35,24 @@ namespace CookingRecipes.Api.Application.Services
 
             return new ApiResponse<string>(tokenHandler.WriteToken(token));
         }
+
+        public int? GetUserIdFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JwtKey")!);
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false
+            };
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+            var userIdClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (userIdClaim != null && int.TryParse(userIdClaim, out var userId)) return userId;
+
+            return null;
+        }
     }
 }

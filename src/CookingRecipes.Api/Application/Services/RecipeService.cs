@@ -14,6 +14,7 @@ namespace CookingRecipes.Api.Application.Services
     public class RecipeService : IRecipeService
     {
         private readonly DataContext _context;
+        private readonly ITokenService _tokenService;
 
         private const string UserNotExistsMessage = "User not exists.";
         private const string NotValidIngredientsMessage = "Not valid ingredients.";
@@ -24,12 +25,16 @@ namespace CookingRecipes.Api.Application.Services
         private const string RecipeUpdatedMessage = "The recipe has been successfully updated.";
         private const string RecipeDeletedMessage = "The recipe has been successfully deleted.";
         private const string RecipeMismatchMessage = "Recipe ID mismatch.";
-        
-        public RecipeService(DataContext context)
+        private const string NotUserIdMatchUpdateMessage = "You cannot update a recipe that you have not created.";
+        private const string NotUserIdMatchDeleteMessage = "You cannot delete a recipe that you have not created.";
+
+        public RecipeService(DataContext context, ITokenService tokenService)
         {
             Guard.IsNotNull(context);
+            Guard.IsNotNull(tokenService);
 
             _context = context;
+            _tokenService = tokenService;
         }
 
         public async Task<ApiResponse<string?>> CreateRecipeAsync(RecipeDto recipe)
@@ -74,13 +79,17 @@ namespace CookingRecipes.Api.Application.Services
             return new ApiResponse<RecipeDto?>(recipe?.ToDto());
         }
 
-        public async Task<ApiResponse<string?>> UpdateRecipeAsync(int id, RecipeDto recipeDto)
+        public async Task<ApiResponse<string?>> UpdateRecipeAsync(int id, RecipeDto recipeDto, string token)
         {
             if (id != recipeDto.RecipeID) return new ApiResponse<string?>(null, false, RecipeMismatchMessage, HttpStatusCodes.BadRequest);
 
             var existingRecipe = await _context.Recipes
                 .Include(r => r.RecipeIngredients)
                 .FirstOrDefaultAsync(r => r.RecipeID == id).ConfigureAwait(false);
+
+            var userIdFromToken = _tokenService.GetUserIdFromToken(token);
+
+            if (userIdFromToken != id) return new ApiResponse<string?>(null, false, NotUserIdMatchUpdateMessage, HttpStatusCodes.Unauthorized);
 
             if (existingRecipe == null) return new ApiResponse<string?>(null, false, RecipeNotExistMessage, HttpStatusCodes.NotFound);
 
@@ -137,14 +146,19 @@ namespace CookingRecipes.Api.Application.Services
         }
 
 
-        public async Task<ApiResponse<string?>> DeleteRecipeAsync(int id)
+        public async Task<ApiResponse<string?>> DeleteRecipeAsync(int id, string token)
         {
             var recipe = await _context.Recipes
                 .Include(r => r.RecipeIngredients)
                 .ThenInclude(ri => ri.Ingredient)
                 .FirstOrDefaultAsync(r => r.RecipeID == id).ConfigureAwait(false);
 
+
             if (recipe == null) return new ApiResponse<string?>(null, false, RecipeNotFoundMessage, HttpStatusCodes.NotFound);
+
+            var userIdFromToken = _tokenService.GetUserIdFromToken(token);
+
+            if (userIdFromToken != recipe.UserID) return new ApiResponse<string?>(null, false, NotUserIdMatchDeleteMessage, HttpStatusCodes.Unauthorized);
 
             _context.RecipeIngredients.RemoveRange(recipe.RecipeIngredients);
             _context.Recipes.Remove(recipe);

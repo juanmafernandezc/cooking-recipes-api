@@ -78,7 +78,9 @@ namespace CookingRecipes.Api.Controllers
         {
             try
             {
-                var result = await _recipeService.UpdateRecipeAsync(id, recipe).ConfigureAwait(false);
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+                var result = await _recipeService.UpdateRecipeAsync(id, recipe, token!).ConfigureAwait(false);
 
                 return StatusCode(result.StatusCode, result);
             }
@@ -95,7 +97,9 @@ namespace CookingRecipes.Api.Controllers
         {
             try
             {
-                var result = await _recipeService.DeleteRecipeAsync(id).ConfigureAwait(false);
+                var token = HttpContext.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+
+                var result = await _recipeService.DeleteRecipeAsync(id, token!).ConfigureAwait(false);
 
                 return StatusCode(result.StatusCode, result);
             }
