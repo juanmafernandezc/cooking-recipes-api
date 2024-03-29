@@ -7,7 +7,6 @@ using CookingRecipes.Api.Domain.Interfaces;
 using CookingRecipes.Api.Domain.Models.Responses;
 using CookingRecipes.Api.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using System.Reflection.Metadata.Ecma335;
 
 namespace CookingRecipes.Api.Application.Services
 {
