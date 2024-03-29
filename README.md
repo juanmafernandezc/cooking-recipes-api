@@ -25,7 +25,11 @@ Server=localhost;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;Trust
 
 #### Setting Up the Database
 
-Execute the following SQL script using your preferred database management tool (e.g., DBeaver, DataGrip) to set up the schema:
+Execute the following SQL script using your preferred database management tool (e.g., DBeaver, DataGrip) to set up the schema.
+
+Before proceeding, make sure you are targeting the `model` database in your SQL Server instance.
+
+**Warning:** Ensure you are operating on the correct database to avoid unintended alterations.
 
 ```sql
 CREATE TABLE Users (
