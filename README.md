@@ -6,7 +6,7 @@ The Cooking Recipes API is a culinary platform allowing users to create, manage,
 
 ### Database Configuration
 
-This API uses Microsoft SQL Server, leveraging the Docker image `mcr.microsoft.com/mssql/server:2022-latest` for database management. To access the database, use the following credentials:
+This API uses Microsoft SQL Server, leveraging the Docker image `mcr.microsoft.com/mssql/server:2022-latest` for database management. To access the database, use the following command:
 
 ```sh
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Admin1234" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
@@ -15,13 +15,7 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Admin1234" -p 1433:1433 -d m
 - **Username:** sa
 - **Password:** Admin1234
 
-Connection string template for local deployment:
-
-```
-Server=localhost;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;
-```
-
-**Important:** For Docker deployments, replace the `Server` address in the connection string with the IP address of the machine hosting the Docker container.
+**Important:** For Docker deployments, replace the `Server` address in the connection string with the IP address of the machine hosting the Docker container. You can find the IP address of your machine by running `ifconfig` on Linux and Mac or `ipconfig` on Windows in the terminal or command prompt.
 
 #### Setting Up the Database
 
