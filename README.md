@@ -1,0 +1,95 @@
+# Cooking Recipes API
+
+## Project Overview
+
+The Cooking Recipes API is a culinary platform allowing users to create, manage, and explore cooking recipes and their corresponding ingredients. It incorporates user authentication, ensuring that read operations are publicly accessible while write operations require user authentication. This security measure mandates that users must be registered within the system to perform any modifications.
+
+### Database Configuration
+
+This API uses Microsoft SQL Server, leveraging the Docker image `mcr.microsoft.com/mssql/server:2022-latest` for database management. To access the database, use the following credentials:
+
+```sh
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=Admin1234" -p 1433:1433 -d mcr.microsoft.com/mssql/server:2022-latest
+```
+
+- **Username:** sa
+- **Password:** Admin1234
+
+Connection string template for local deployment:
+
+```
+Server=192.168.1.13;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;
+```
+
+**Important:** For Docker deployments, replace the `Server` address in the connection string with the IP address of the machine hosting the Docker container.
+
+#### Setting Up the Database
+
+Execute the following SQL script using your preferred database management tool (e.g., DBeaver, DataGrip) to set up the schema:
+
+```sql
+CREATE TABLE Users (
+    UserID INT IDENTITY PRIMARY KEY,
+    Username NVARCHAR(255) NOT NULL,
+    PasswordHash VARBINARY(256) NOT NULL,
+    PasswordSalt VARBINARY(256) NOT NULL,
+    Email NVARCHAR(255) NOT NULL UNIQUE,
+);
+
+CREATE TABLE Recipes (
+    RecipeID INT IDENTITY PRIMARY KEY,
+    UserID INT NOT NULL,
+    Title NVARCHAR(255) NOT NULL,
+    Description NVARCHAR(MAX) NULL,
+    Instructions NVARCHAR(MAX) NOT NULL,
+    PrepTime INT NOT NULL,
+    CookTime INT NOT NULL,
+    Servings INT NOT NULL,
+    CONSTRAINT FK_Recipes_Users FOREIGN KEY (UserID) REFERENCES Users(UserID)
+);
+
+CREATE TABLE Ingredients (
+    IngredientID INT IDENTITY PRIMARY KEY,
+    Name NVARCHAR(255) NOT NULL,
+    Description NVARCHAR(MAX) NULL
+);
+
+CREATE TABLE RecipeIngredients (
+    RecipeID INT NOT NULL,
+    IngredientID INT NOT NULL,
+    Quantity DECIMAL(5,2) NOT NULL,
+    MeasureUnit NVARCHAR(50) NOT NULL,
+    CONSTRAINT PK_RecipeIngredients PRIMARY KEY (RecipeID, IngredientID),
+    CONSTRAINT FK_RecipeIngredients_Recipes FOREIGN KEY (RecipeID) REFERENCES Recipes(RecipeID),
+    CONSTRAINT FK_RecipeIngredients_Ingredients FOREIGN KEY (IngredientID) REFERENCES Ingredients(IngredientID)
+);
+```
+
+### Environment Variables
+Ensure the following environment variables are configured within the project:
+
+```json
+"environmentVariables": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "DatabaseConnectionString": "Server=localhost;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;",
+    "JwtKey": "",
+    "JwtIssuer": "",
+    "JwtAudience": ""
+}
+```
+
+Generate and assign values for JwtKey, JwtIssuer, and JwtAudience, as they are not provided in the repository for security reasons.
+
+### Running the Project
+To run the project locally, simply deploy it using the provided profile within your development environment. For Docker deployment, execute the following commands from the project root:
+
+```sh
+docker build -t cookingrecipes.api .
+docker run -d -p 8080:8080 \
+  --name mycookingapi \
+  -e "DatabaseConnectionString=Server=192.168.1.13;Database=model;User Id=sa;Password=Admin1234;Encrypt=True;TrustServerCertificate=True;Connection Timeout=30;" \
+  -e "JwtKey=tu_jwt_key_aqui" \
+  -e "JwtIssuer=tu_jwt_issuer_aqui" \
+  -e "JwtAudience=tu_jwt_audience_aqui" \
+  cookingrecipes.api
+```
