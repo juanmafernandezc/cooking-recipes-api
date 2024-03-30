@@ -31,7 +31,7 @@ namespace CookingRecipes.Api.Application.Services
 
         public async Task<ApiResponse<string?>> CreateIngredientAsync(IngredientDto ingredient)
         {
-            var ingredientExists = await _context.Ingredients.AnyAsync(i => i.Name.ToLower() == ingredient.Name.ToLower());
+            var ingredientExists = await _context.Ingredients.AnyAsync(i => i.Name.ToLower() == ingredient.Name.ToLower()).ConfigureAwait(false);
 
             if (ingredientExists) return new ApiResponse<string?>(null, false, IngredientExistsMessage, HttpStatusCodes.Conflict);
 
@@ -85,7 +85,7 @@ namespace CookingRecipes.Api.Application.Services
         {
             var ingredient = await _context.Ingredients
                 .Include(i => i.RecipeIngredients)
-                .FirstOrDefaultAsync(i => i.IngredientID == ingredientId);
+                .FirstOrDefaultAsync(i => i.IngredientID == ingredientId).ConfigureAwait(false);
 
             if (ingredient == null) return new ApiResponse<string?>(null, false, IngredientNotExistMessage, HttpStatusCodes.NotFound);
 

@@ -95,7 +95,7 @@ namespace CookingRecipes.Api.Application.Services
             var newIngredientIds = recipeDto.RecipeIngredients.Select(i => i.IngredientID).Distinct().ToList();
             foreach (var ingredientId in newIngredientIds)
             {
-                var ingredientExists = await _context.Ingredients.AnyAsync(i => i.IngredientID == ingredientId);
+                var ingredientExists = await _context.Ingredients.AnyAsync(i => i.IngredientID == ingredientId).ConfigureAwait(false);
                 if (!ingredientExists) return new ApiResponse<string?>(null, false, $"Ingredient with ID {ingredientId} not found.", HttpStatusCodes.NotFound);
             }
 
