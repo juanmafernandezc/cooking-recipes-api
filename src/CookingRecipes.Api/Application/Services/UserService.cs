@@ -18,7 +18,7 @@ namespace CookingRecipes.Api.Application.Services
 
         private const string UserExistsMessage = "User already exists.";
         private const string UserCreatedMessage = "User created successfully.";
-        private const string UserNotRegisteredMessage = "User not registered.";
+        private const string UserNotRegisteredOrIncorrectPasswordMessage = "User not registered or password is incorrect.";
         private const string NotChangedDatabaseMessage = "No changes were made to the database.";
 
         public UserService(DataContext context, ITokenService tokenService)
@@ -55,7 +55,7 @@ namespace CookingRecipes.Api.Application.Services
         {
             var user = await ValidateLoginAsync(userLoginDto).ConfigureAwait(false);
 
-            if (user == null) return new ApiResponse<string?>(null, false, UserNotRegisteredMessage, HttpStatusCodes.Unauthorized);
+            if (user == null) return new ApiResponse<string?>(null, false, UserNotRegisteredOrIncorrectPasswordMessage, HttpStatusCodes.Unauthorized);
 
             return _tokenService.CreateToken(user)!;
         }
