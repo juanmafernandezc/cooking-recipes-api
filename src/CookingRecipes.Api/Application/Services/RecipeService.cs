@@ -86,9 +86,9 @@ namespace CookingRecipes.Api.Application.Services
                 .Include(r => r.RecipeIngredients)
                 .FirstOrDefaultAsync(r => r.RecipeID == id).ConfigureAwait(false);
 
-            var userIdFromToken = _tokenService.GetUserIdFromToken(token);
-
             if (existingRecipe == null) return new ApiResponse<string?>(null, false, RecipeNotExistMessage, HttpStatusCodes.NotFound);
+
+            var userIdFromToken = _tokenService.GetUserIdFromToken(token);
 
             if (userIdFromToken != id) return new ApiResponse<string?>(null, false, NotUserIdMatchUpdateMessage, HttpStatusCodes.Unauthorized);
 
