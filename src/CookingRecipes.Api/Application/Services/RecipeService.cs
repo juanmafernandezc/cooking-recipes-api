@@ -124,17 +124,16 @@ namespace CookingRecipes.Api.Application.Services
                 {
                     existingIngredient.Quantity = ingredientDto.Quantity;
                     existingIngredient.MeasureUnit = ingredientDto.MeasureUnit;
+                    continue;
                 }
-                else
+
+                existingRecipe.RecipeIngredients.Add(new RecipeIngredient
                 {
-                    existingRecipe.RecipeIngredients.Add(new RecipeIngredient
-                    {
-                        RecipeID = id,
-                        IngredientID = ingredientDto.IngredientID,
-                        Quantity = ingredientDto.Quantity,
-                        MeasureUnit = ingredientDto.MeasureUnit
-                    });
-                }
+                    RecipeID = id,
+                    IngredientID = ingredientDto.IngredientID,
+                    Quantity = ingredientDto.Quantity,
+                    MeasureUnit = ingredientDto.MeasureUnit
+                });
             }
 
             var result = await _context.SaveChangesAsync().ConfigureAwait(false);
